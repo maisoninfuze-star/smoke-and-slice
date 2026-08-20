@@ -1,0 +1,16 @@
+export const STORE = {
+  name: "Mr Smoke Et Slice",
+  taglineFr: "L'amour à la première slice",
+  taglineEn: "Love at first slice",
+  address: "5518 Sherbrooke St W, Montréal, QC H4A 1W2",
+  addressShort: "5518 Sherbrooke O., NDG",
+  phone: "+15148265780",
+  phoneDisplay: "(514) 826-5780",
+  phoneAlt: "+15148200069",
+  phoneAltDisplay: "(514) 820-0069",
+  lat: 45.4713,
+  lng: -73.6157,
+  googleRating: 4.6,
+  googleReviews: 136,
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Mr+Smoke+Et+Slice+5518+Sherbrooke+St+W+Montreal",
+} as const;

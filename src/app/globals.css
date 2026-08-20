@@ -1,0 +1,327 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------
+   Mr Smoke Et Slice — design tokens lifted from the storefront sign
+   --------------------------------------------------------------- */
+@theme {
+  --color-charcoal: #22252b;
+  --color-charcoal-deep: #14161a;
+  --color-slate: #3a4048;
+  --color-slate-soft: #2b2f36;
+  --color-ember: #f2610c;
+  --color-flame: #e01b24;
+  --color-gold: #f5b33c;
+  --color-cream: #f7efe2;
+  --color-halal: #25d366;
+  --color-smoke: #9aa1ac;
+
+  /* --- three voices, one rule (see layout.tsx) --- */
+  --font-display: "Cabinet Grotesk", var(--font-anton), "Arial Black", sans-serif;
+  --font-editorial: "Erode", Georgia, "Times New Roman", serif;
+  --font-sans: "Satoshi", var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-accent: var(--font-bebas), "Arial Narrow", sans-serif;
+  /* The awning wordmark only. Never used for running text. */
+  --font-sign: var(--font-anton), "Arial Black", sans-serif;
+
+  --ease-slice: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --text-hero: clamp(2.9rem, 8vw, 7rem);
+  --text-h2: clamp(2rem, 4.8vw, 4rem);
+
+  --radius-card: 14px;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-charcoal-deep);
+  color: var(--color-cream);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Signature ember gradient — the gold→orange→red run across the sign */
+.ember-text {
+  background: linear-gradient(100deg, #f5b33c 0%, #f2610c 48%, #e01b24 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ember-bg {
+  background: linear-gradient(100deg, #f5b33c 0%, #f2610c 48%, #e01b24 100%);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  line-height: 0.9;
+}
+
+/* The wordmark keeps the awning's condensed gothic. */
+.sign {
+  font-family: var(--font-sign);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+}
+
+/* Dish names and guest quotes — the food talking, not the brand. */
+.editorial {
+  font-family: var(--font-editorial);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+.accent {
+  font-family: var(--font-accent);
+  letter-spacing: 0.04em;
+}
+
+/* The banner strip under the awning: HAMBURGER • PIZZA • FIRE GRILLED */
+.strip {
+  font-family: var(--font-accent);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.card {
+  background: color-mix(in srgb, var(--color-slate) 26%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-cream) 8%, transparent);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(6px);
+}
+
+.card-hover {
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+.card-hover:hover {
+  border-color: color-mix(in srgb, var(--color-ember) 55%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -18px rgba(242, 97, 12, 0.55);
+}
+
+.btn-ember {
+  background: linear-gradient(100deg, #f5b33c 0%, #f2610c 48%, #e01b24 100%);
+  color: #14161a;
+  font-family: var(--font-accent);
+  letter-spacing: 0.06em;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+.btn-ember:hover {
+  filter: brightness(1.08);
+}
+.btn-ember:active {
+  transform: translateY(1px);
+}
+.btn-ember:disabled {
+  filter: grayscale(0.8) brightness(0.7);
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  border: 1px solid color-mix(in srgb, var(--color-cream) 22%, transparent);
+  color: var(--color-cream);
+  font-family: var(--font-accent);
+  letter-spacing: 0.06em;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+.btn-ghost:hover {
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 10%, transparent);
+}
+
+.field {
+  background: color-mix(in srgb, var(--color-charcoal) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-cream) 14%, transparent);
+  border-radius: 10px;
+  color: var(--color-cream);
+  transition: border-color 140ms ease;
+}
+.field:focus {
+  outline: none;
+  border-color: var(--color-ember);
+}
+.field::placeholder {
+  color: color-mix(in srgb, var(--color-smoke) 75%, transparent);
+}
+
+/* Charred film-grain overlay so flat panels don't read as plastic */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes emberRise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: translateY(-160px) scale(0.4); opacity: 0; }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SIGNATURE MOTION — "l'amour à la première slice"
+   The headline is cut and the halves part along the blade. Every rule
+   here has a visible resting state so the page is complete without JS.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.slice-title { position: relative; display: block; }
+
+.slice-line {
+  position: relative;
+  display: block;
+  overflow: visible;
+}
+
+/* Both halves stack; the top one is clipped to the upper half of the glyphs
+   and the bottom one to the lower half, so together they read as one line. */
+.slice-half {
+  display: block;
+  grid-area: 1 / 1;
+}
+.slice-line { display: grid; }
+
+/* The cut sits at exactly 50% of the line box, but the clip region is extended
+   well past the box on the outer edge. With tight leading the accents on É and
+   Û overflow above the box, and a clip that stopped at the box edge sheared
+   them off — losing an accent in a French headline is not an option. */
+.slice-top { clip-path: inset(-60% 0 50% 0); }
+.slice-bottom { clip-path: inset(50% 0 -60% 0); }
+
+/* Resting state: halves together. This is what shows with JS off or motion
+   reduced, so the headline is never invisible. */
+.slice-half { transform: translate3d(0, 0, 0); }
+
+/* The blade sweep. */
+.slice-cut {
+  position: absolute;
+  left: -2%;
+  top: 50%;
+  width: 104%;
+  height: 2px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, transparent, #f5b33c, #f2610c 55%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slice-run .slice-top {
+  animation: slice-part-up 1.05s var(--ease-slice) both;
+  animation-delay: calc(var(--i) * 0.13s + 0.25s);
+}
+.slice-run .slice-bottom {
+  animation: slice-part-down 1.05s var(--ease-slice) both;
+  animation-delay: calc(var(--i) * 0.13s + 0.25s);
+}
+.slice-run .slice-cut {
+  animation: slice-blade 0.62s var(--ease-slice) both;
+  animation-delay: calc(var(--i) * 0.13s + 0.1s);
+}
+
+@keyframes slice-part-up {
+  0%   { transform: translate3d(0, 0.14em, 0); opacity: 0; }
+  38%  { transform: translate3d(0.035em, -0.1em, 0); opacity: 1; }
+  100% { transform: translate3d(0, 0, 0); opacity: 1; }
+}
+@keyframes slice-part-down {
+  0%   { transform: translate3d(0, -0.14em, 0); opacity: 0; }
+  38%  { transform: translate3d(-0.035em, 0.1em, 0); opacity: 1; }
+  100% { transform: translate3d(0, 0, 0); opacity: 1; }
+}
+@keyframes slice-blade {
+  0%   { transform: scaleX(0); opacity: 0; }
+  22%  { opacity: 1; }
+  78%  { opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+
+/* ── embers ─────────────────────────────────────────────────────── */
+.ember-field {
+  position: absolute;
+  inset: -18% 0 -8% 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+}
+.ember {
+  position: absolute;
+  bottom: -8px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #f5b33c 0%, #f2610c 55%, transparent 72%);
+  opacity: 0;
+  animation-name: ember-drift;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+@keyframes ember-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
+  12%  { opacity: 0.85; }
+  70%  { opacity: 0.5; }
+  100% { transform: translate3d(14px, -260px, 0) scale(0.35); opacity: 0; }
+}
+
+/* ── marquee ────────────────────────────────────────────────────── */
+.marquee { overflow: hidden; }
+.marquee-track {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: marquee-run 42s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee-run {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ── reveal resting states ──────────────────────────────────────
+   GSAP sets the from-state at runtime. Without JS these stay visible. */
+[data-reveal],
+[data-stagger] > * { opacity: 1; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   REDUCED MOTION — one switch kills every animation on the page.
+   ═══════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ember-field { display: none; }
+  .slice-half { transform: none !important; opacity: 1 !important; }
+  .marquee-track { animation: none !important; }
+}
+
+.reduce-motion .ember-field { display: none; }
+.reduce-motion .marquee-track { animation: none !important; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,197 @@
+// Mr Smoke Et Slice — data model
+// Dev uses SQLite for zero-setup. For production swap provider to "postgresql"
+// and point DATABASE_URL at your Postgres instance; no model changes required.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         String    @default("CUSTOMER") // CUSTOMER | ADMIN
+  createdAt    DateTime  @default(now())
+  addresses    Address[]
+  orders       Order[]
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String  @default("Home")
+  line1     String
+  line2     String?
+  city      String  @default("Montréal")
+  province  String  @default("QC")
+  postal    String
+  buzzer    String?
+  notes     String?
+  isDefault Boolean @default(false)
+
+  @@index([userId])
+}
+
+model Category {
+  id       String        @id @default(cuid())
+  slug     String        @unique
+  nameFr   String
+  nameEn   String
+  descFr   String?
+  descEn   String?
+  sort     Int           @default(0)
+  active   Boolean       @default(true)
+  items    MenuItem[]
+}
+
+model MenuItem {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  categoryId  String
+  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  nameFr      String
+  nameEn      String
+  descFr      String?
+  descEn      String?
+  priceCents  Int
+  image       String?
+  badges      String       @default("") // comma-separated: halal,spicy,popular,new,vegetarian
+  sort        Int          @default(0)
+  active      Boolean      @default(true)
+  optionGroups OptionGroup[]
+  orderItems  OrderItem[]
+}
+
+model OptionGroup {
+  id         String       @id @default(cuid())
+  menuItemId String
+  menuItem   MenuItem     @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  nameFr     String
+  nameEn     String
+  minSelect  Int          @default(0)
+  maxSelect  Int          @default(1)
+  sort       Int          @default(0)
+  options    Option[]
+}
+
+model Option {
+  id            String      @id @default(cuid())
+  optionGroupId String
+  optionGroup   OptionGroup @relation(fields: [optionGroupId], references: [id], onDelete: Cascade)
+  nameFr        String
+  nameEn        String
+  priceCents    Int         @default(0)
+  sort          Int         @default(0)
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Guest / contact details captured at checkout
+  contactName     String
+  contactPhone    String
+  contactEmail    String?
+
+  fulfilment      String      // PICKUP | DELIVERY
+  status          String      @default("PENDING")
+  // PENDING | CONFIRMED | PREPARING | READY | DISPATCHED | DELIVERED | COMPLETED | CANCELLED
+
+  // Delivery address snapshot (nullable for pickup)
+  addrLine1       String?
+  addrLine2       String?
+  addrCity        String?
+  addrProvince    String?
+  addrPostal      String?
+  addrNotes       String?
+
+  subtotalCents   Int
+  deliveryCents   Int         @default(0)
+  tipCents        Int         @default(0)
+  tpsCents        Int         @default(0)  // GST 5%
+  tvqCents        Int         @default(0)  // QST 9.975%
+  totalCents      Int
+
+  paymentMethod   String      @default("CASH") // CASH | CARD
+  paymentStatus   String      @default("UNPAID") // UNPAID | PAID | REFUNDED
+  stripeSessionId String?
+
+  // Uber Direct
+  uberQuoteId     String?
+  uberDeliveryId  String?
+  uberStatus      String?
+  uberTrackingUrl String?
+  courierName     String?
+  courierPhone    String?
+  courierLat      Float?
+  courierLng      Float?
+  etaAt           DateTime?
+
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+  events          OrderEvent[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId     String?
+  menuItem       MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+  nameSnapshot   String
+  qty            Int
+  unitPriceCents Int
+  optionsJson    String   @default("[]") // [{name, priceCents}]
+  lineTotalCents Int
+
+  @@index([orderId])
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  dataJson  String?
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+model StoreSetting {
+  id                  String  @id @default("singleton")
+  acceptingOrders     Boolean @default(true)
+  deliveryEnabled     Boolean @default(true)
+  pickupEnabled       Boolean @default(true)
+  deliveryRadiusKm    Float   @default(8)
+  minDeliveryCents    Int     @default(1500)
+  prepTimeMinutes     Int     @default(20)
+  hoursJson           String  @default("[]")
+}

@@ -1,0 +1,68 @@
+{
+  "name": "Mr Smoke Et Slice",
+  "legalNameVariants": ["MR Smoke Et Slice", "Mr. Smoke & Slice"],
+  "tagline": { "fr": "L'amour à la première slice", "en": "Love at first slice" },
+  "positioning": {
+    "category": "Halal fire-grilled burgers & pizza",
+    "descriptors": ["Halal", "Hamburger", "Pizza", "Grillée au feu", "Fire Grilled"],
+    "pricePoint": "$10–20 per person",
+    "neighbourhood": "Notre-Dame-de-Grâce (NDG), Montréal",
+    "languages": ["fr-CA", "en-CA"],
+    "socialProof": { "googleRating": 4.6, "googleReviews": 136 }
+  },
+  "contact": {
+    "address": "5518 Sherbrooke St W, Montreal, Quebec H4A 1W2",
+    "phonePrimary": "+15148265780",
+    "phoneSecondary": "+15148200069",
+    "phoneDisplayPrimary": "(514) 826-5780",
+    "phoneDisplaySecondary": "(514) 820-0069",
+    "lat": 45.4713,
+    "lng": -73.6157
+  },
+  "colors": {
+    "charcoal":   { "hex": "#22252B", "role": "Primary surface — the painted storefront brick and awning ground" },
+    "slate":      { "hex": "#3A4048", "role": "Elevated surface / cards / storefront frame blue-grey" },
+    "ember":      { "hex": "#F2610C", "role": "Primary accent — flame orange from the signage" },
+    "flame":      { "hex": "#E01B24", "role": "Hot accent — the red in 'ET' and the OUVERT neon" },
+    "gold":       { "hex": "#F5B33C", "role": "Signature — the gold of 'MR' and flame highlights" },
+    "cream":      { "hex": "#F7EFE2", "role": "Type on dark, the cream of 'SMOKE' and 'SLICE'" },
+    "halalGreen": { "hex": "#25D366", "role": "Halal certification badge / neon green" },
+    "smoke":      { "hex": "#9AA1AC", "role": "Muted body text, captions, dividers" }
+  },
+  "gradients": {
+    "ember": "linear-gradient(100deg, #F5B33C 0%, #F2610C 48%, #E01B24 100%)",
+    "charcoal": "linear-gradient(180deg, #22252B 0%, #14161A 100%)"
+  },
+  "typography": {
+    "display": {
+      "reference": "Signage uses a heavy condensed slab/gothic with a metallic gold-to-cream gradient",
+      "webface": "Anton",
+      "usage": "Headlines, section titles. Uppercase, tight tracking (-0.02em)."
+    },
+    "body": {
+      "webface": "Inter",
+      "usage": "Body copy, menu items, UI. 400/500/600."
+    },
+    "accent": {
+      "webface": "Bebas Neue",
+      "usage": "Prices, badges, nav — mirrors the 'HAMBURGER • PIZZA • FIRE GRILLED' banner strip."
+    }
+  },
+  "logo": {
+    "lockup": "Stacked: 'MR' (gold) above 'SMOKE' (cream) + 'ET' (flame red) + 'SLICE' (cream), tagline underneath in small caps",
+    "icons": ["skewer / brochette", "burger", "pizza slice", "flame", "grill pan"],
+    "clearSpace": "Minimum 0.5× the cap-height of 'MR' on all sides",
+    "onLight": "Use charcoal lockup with ember accents",
+    "onDark": "Use cream lockup with gold/ember accents (primary usage)"
+  },
+  "voice": {
+    "tone": ["Warm", "neighbourhood-proud", "unpretentious", "a little smoky swagger"],
+    "bilingual": "French first, English second — matches the awning. Never machine-translated tone.",
+    "avoid": ["Corporate fast-food speak", "exclamation stacking", "'artisanal' clichés"]
+  },
+  "photography": {
+    "direction": "Close, hand-held, hot-off-the-grill. Real hands in frame. Charred edges, visible cheese pull, matte metal pizza pans, dark walnut tables.",
+    "lighting": "Single warm key from the side, deep charcoal falloff, ember-coloured rim light.",
+    "avoid": ["Sterile white-background studio shots", "over-saturated HDR", "perfectly symmetrical plating", "obvious CGI gloss"]
+  }
+}
