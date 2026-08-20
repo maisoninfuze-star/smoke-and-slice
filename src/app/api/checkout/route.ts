@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getStripe, stripeEnabled } from "@/lib/stripe";
+import { siteUrl } from "@/lib/site";
 
 const schema = z.object({ orderId: z.string().min(1) });
 
@@ -24,7 +25,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "ALREADY_PAID" }, { status: 409 });
   }
 
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const site = siteUrl();
 
   const session = await getStripe().checkout.sessions.create({
     mode: "payment",

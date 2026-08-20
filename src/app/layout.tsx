@@ -5,6 +5,7 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { STORE } from "@/lib/store";
+import { siteUrlObject } from "@/lib/site";
 import "./globals.css";
 
 /* Anton stays, but only for the logo lockup — it is the closest web face to the
@@ -15,7 +16,7 @@ const bebas = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--font-
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: siteUrlObject(),
   title: {
     default: "Mr Smoke Et Slice — Burgers halal & pizza grillés au feu | NDG Montréal",
     template: "%s | Mr Smoke Et Slice",

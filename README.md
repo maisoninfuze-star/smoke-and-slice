@@ -30,7 +30,7 @@ production — you need a Postgres database.
    |---|---|---|
    | `DATABASE_URL` | yes | set for you when you attach Postgres |
    | `AUTH_SECRET` | yes | `openssl rand -base64 32` |
-   | `NEXT_PUBLIC_SITE_URL` | yes | `https://your-domain.ca` |
+   | `NEXT_PUBLIC_SITE_URL` | no | `https://your-domain.ca` — include the scheme. Left blank or omitted, the site falls back to Vercel's own deployment URL. |
    | `UBER_CUSTOMER_ID` / `UBER_CLIENT_ID` / `UBER_CLIENT_SECRET` | no | delivery falls back to a flat rate without them |
    | `UBER_WEBHOOK_SECRET` | no | needed for live courier tracking |
    | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `NEXT_PUBLIC_STRIPE_ENABLED` | no | cash-only works without them |
@@ -41,6 +41,12 @@ production — you need a Postgres database.
    DATABASE_URL="<your production url>" npm run db:deploy   # create tables
    DATABASE_URL="<your production url>" npm run db:seed     # load the menu
    ```
+
+Note that Vercel saves a cleared environment variable as an **empty string**,
+not as unset — and `??` does not catch that, which is why an empty
+`NEXT_PUBLIC_SITE_URL` used to crash the build with a bare
+`TypeError: Invalid URL` on `/_not-found`. `src/lib/site.ts` now normalises
+that value and cannot throw.
 
 The build is designed not to fail if the database is unreachable — the
 prerendered pages fall back to empty and fill in on the next revalidation, so a
