@@ -4,13 +4,47 @@ Bilingual (FR/EN) ordering site for the halal fire-grill on Sherbrooke West in N
 Montréal. Menu browsing, accounts, cart, Québec-accurate tax math, Uber Direct
 delivery, Stripe or cash payment, live order tracking, and a kitchen dashboard.
 
-## Run it
+## Run it locally
 
 ```bash
 npm install
-npm run db:reset   # creates SQLite db, pushes schema, seeds menu + admin
+npm run db:local   # derives a SQLite schema, pushes it, seeds menu + admin
 npm run dev        # http://localhost:3000
 ```
+
+`prisma/schema.prisma` targets **Postgres**, because that is what deploys.
+`db:local` sed-swaps only the provider line into `prisma/.schema.local.prisma`
+so local SQLite can never drift from the real schema.
+
+## Deploy to Vercel
+
+Vercel's filesystem is read-only and ephemeral, so SQLite cannot be used in
+production — you need a Postgres database.
+
+1. Import the repo at vercel.com/new.
+2. **Storage → Create Database → Postgres**, and attach it to the project.
+   That sets `DATABASE_URL` automatically.
+3. Add the remaining environment variables (Settings → Environment Variables):
+
+   | Variable | Required | Notes |
+   |---|---|---|
+   | `DATABASE_URL` | yes | set for you when you attach Postgres |
+   | `AUTH_SECRET` | yes | `openssl rand -base64 32` |
+   | `NEXT_PUBLIC_SITE_URL` | yes | `https://your-domain.ca` |
+   | `UBER_CUSTOMER_ID` / `UBER_CLIENT_ID` / `UBER_CLIENT_SECRET` | no | delivery falls back to a flat rate without them |
+   | `UBER_WEBHOOK_SECRET` | no | needed for live courier tracking |
+   | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `NEXT_PUBLIC_STRIPE_ENABLED` | no | cash-only works without them |
+
+4. Deploy. Then seed the menu once against the production database:
+
+   ```bash
+   DATABASE_URL="<your production url>" npm run db:deploy   # create tables
+   DATABASE_URL="<your production url>" npm run db:seed     # load the menu
+   ```
+
+The build is designed not to fail if the database is unreachable — the
+prerendered pages fall back to empty and fill in on the next revalidation, so a
+missing env var costs you content, not a deployment.
 
 Admin sign-in: `admin@mrsmokeetslice.ca` / `smoke2026` — **change this before launch.**
 

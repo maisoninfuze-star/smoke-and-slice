@@ -3,17 +3,22 @@ import { Hero } from "@/components/Hero";
 import { HomeSections } from "@/components/HomeSections";
 import { KitchenReel } from "@/components/KitchenReel";
 import { Marquee } from "@/components/Marquee";
-import { db } from "@/lib/db";
+import { db, safeQuery } from "@/lib/db";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const featured = await db.menuItem.findMany({
-    where: { active: true, badges: { contains: "popular" } },
-    orderBy: { sort: "asc" },
-    take: 6,
-    include: { category: true },
-  });
+  const featured = await safeQuery(
+    () =>
+      db.menuItem.findMany({
+        where: { active: true, badges: { contains: "popular" } },
+        orderBy: { sort: "asc" },
+        take: 6,
+        include: { category: true },
+      }),
+    [],
+    "home featured items"
+  );
 
   return (
     <>

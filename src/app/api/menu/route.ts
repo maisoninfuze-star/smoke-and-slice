@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { db, safeQuery } from "@/lib/db";
 
 export const revalidate = 60;
 
 export async function GET() {
-  const categories = await db.category.findMany({
+  const categories = await safeQuery(
+    () => db.category.findMany({
     where: { active: true },
     orderBy: { sort: "asc" },
     include: {
@@ -19,6 +20,9 @@ export async function GET() {
         },
       },
     },
-  });
+  }),
+    [],
+    "api menu"
+  );
   return NextResponse.json({ categories });
 }

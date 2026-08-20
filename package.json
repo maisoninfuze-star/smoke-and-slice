@@ -10,9 +10,12 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "rm -f prisma/dev.db && prisma db push && tsx prisma/seed.ts",
+    "db:reset": "rm -f prisma/dev.db && bash scripts/local-db.sh",
     "creatives": "tsx scripts/generate-creatives.ts",
-    "audit:menu": "tsx scripts/audit-menu.ts"
+    "audit:menu": "tsx scripts/audit-menu.ts",
+    "db:local": "bash scripts/local-db.sh",
+    "db:deploy": "prisma db push",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",

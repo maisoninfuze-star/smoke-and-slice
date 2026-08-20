@@ -1,11 +1,12 @@
-import { db } from "@/lib/db";
+import { db, safeQuery } from "@/lib/db";
 import { MenuBrowser } from "@/components/MenuBrowser";
 
 export const revalidate = 60;
 export const metadata = { title: "Menu" };
 
 export default async function MenuPage() {
-  const categories = await db.category.findMany({
+  const categories = await safeQuery(
+    () => db.category.findMany({
     where: { active: true },
     orderBy: { sort: "asc" },
     include: {
@@ -17,7 +18,10 @@ export default async function MenuPage() {
         },
       },
     },
-  });
+  }),
+    [],
+    "menu categories"
+  );
 
   return <MenuBrowser categories={JSON.parse(JSON.stringify(categories))} />;
 }

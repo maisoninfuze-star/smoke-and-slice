@@ -1,13 +1,19 @@
 // Mr Smoke Et Slice — data model
-// Dev uses SQLite for zero-setup. For production swap provider to "postgresql"
-// and point DATABASE_URL at your Postgres instance; no model changes required.
+//
+// This file is the single source of truth and targets Postgres, which is what
+// deploys. Vercel's filesystem is read-only and ephemeral, so SQLite cannot be
+// used in production.
+//
+// For zero-setup local work, `npm run db:local` derives a SQLite copy of this
+// schema into prisma/.schema.local.prisma (provider line swapped, nothing else)
+// so the two can never drift apart.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
