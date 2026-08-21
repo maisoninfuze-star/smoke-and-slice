@@ -16,10 +16,26 @@ npm run dev        # http://localhost:3000
 `db:local` sed-swaps only the provider line into `prisma/.schema.local.prisma`
 so local SQLite can never drift from the real schema.
 
+## How the menu works
+
+The menu is a **file**, not database rows: `src/data/menu-data.ts`. The menu
+page, the home page and `/api/menu` are all statically prerendered from it, so
+they render with no database connection at all. To change the menu, edit that
+file and push.
+
+`npm run audit:menu` prints it in the same shape as the printed card so the two
+can be diffed.
+
+The database is only used for things that genuinely need to persist: orders,
+accounts, sessions and store settings. **The site shows its full menu and takes
+phone orders even if the database is completely down** — only online checkout
+needs it.
+
 ## Deploy to Vercel
 
-Vercel's filesystem is read-only and ephemeral, so SQLite cannot be used in
-production — you need a Postgres database.
+The site deploys and shows the full menu with no database. You only need
+Postgres once you want to accept orders online (Vercel's filesystem is
+read-only and ephemeral, so SQLite cannot be used in production).
 
 1. Import the repo at vercel.com/new.
 2. **Storage → Create Database → Postgres**, and attach it to the project.
@@ -35,12 +51,14 @@ production — you need a Postgres database.
    | `UBER_WEBHOOK_SECRET` | no | needed for live courier tracking |
    | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` / `NEXT_PUBLIC_STRIPE_ENABLED` | no | cash-only works without them |
 
-4. Deploy. Then seed the menu once against the production database:
+4. Deploy. Then create the order tables once:
 
    ```bash
    DATABASE_URL="<your production url>" npm run db:deploy   # create tables
-   DATABASE_URL="<your production url>" npm run db:seed     # load the menu
+   DATABASE_URL="<your production url>" npm run db:seed     # admin account
    ```
+
+   The menu needs neither step — it ships in the build.
 
 Note that Vercel saves a cleared environment variable as an **empty string**,
 not as unset — and `??` does not catch that, which is why an empty

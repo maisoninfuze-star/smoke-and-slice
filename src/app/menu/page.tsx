@@ -1,27 +1,10 @@
-import { db, safeQuery } from "@/lib/db";
+import { getMenu } from "@/lib/menu";
 import { MenuBrowser } from "@/components/MenuBrowser";
 
-export const revalidate = 60;
+// The menu comes from a file, so this page is fully static.
+export const dynamic = "force-static";
 export const metadata = { title: "Menu" };
 
-export default async function MenuPage() {
-  const categories = await safeQuery(
-    () => db.category.findMany({
-    where: { active: true },
-    orderBy: { sort: "asc" },
-    include: {
-      items: {
-        where: { active: true },
-        orderBy: { sort: "asc" },
-        include: {
-          optionGroups: { orderBy: { sort: "asc" }, include: { options: { orderBy: { sort: "asc" } } } },
-        },
-      },
-    },
-  }),
-    [],
-    "menu categories"
-  );
-
-  return <MenuBrowser categories={JSON.parse(JSON.stringify(categories))} />;
+export default function MenuPage() {
+  return <MenuBrowser categories={getMenu()} />;
 }

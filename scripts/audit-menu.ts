@@ -1,33 +1,27 @@
-/** Prints the seeded menu back as dollar prices so it can be diffed against the printed card. */
-import { PrismaClient } from "@prisma/client";
+/**
+ * Print the menu exactly as the site will render it, so it can be diffed
+ * against the printed card. Reads the same file the site reads — no database.
+ *
+ *   npx tsx scripts/audit-menu.ts
+ */
+import { getMenu, menuCounts } from "../src/lib/menu.js";
 
-const db = new PrismaClient();
-const f = (c: number) => (c / 100).toFixed(2);
+const money = (c: number) => (c / 100).toFixed(2);
 
-async function main() {
-  const cats = await db.category.findMany({
-    orderBy: { sort: "asc" },
-    include: {
-      items: {
-        orderBy: { sort: "asc" },
-        include: { optionGroups: { include: { options: { orderBy: { sort: "asc" } } } } },
-      },
-    },
-  });
-
-  for (const c of cats) {
-    console.log(`\n### ${c.nameFr} / ${c.nameEn}  (${c.items.length} items)`);
-    for (const i of c.items) {
-      const size = i.optionGroups.find((g) => g.nameEn === "Size");
-      if (size) {
-        const ladder = size.options.map((o) => f(i.priceCents + o.priceCents)).join(" | ");
-        console.log(`  ${i.nameFr.padEnd(24)} ${ladder}`);
-      } else {
-        console.log(`  ${i.nameFr.padEnd(24)} ${f(i.priceCents)}`);
+for (const cat of getMenu()) {
+  console.log(`\n### ${cat.nameFr} / ${cat.nameEn}  (${cat.items.length} items)`);
+  for (const item of cat.items) {
+    console.log(`  ${item.nameFr.padEnd(26)} ${money(item.priceCents).padStart(6)}`);
+    for (const g of item.optionGroups) {
+      const priced = g.options.filter((o) => o.priceCents > 0);
+      if (priced.length) {
+        console.log(
+          `      ${g.nameFr}: ` + priced.map((o) => `${o.nameFr} +${money(o.priceCents)}`).join(", ")
+        );
       }
     }
   }
-  await db.$disconnect();
 }
 
-main();
+const c = menuCounts();
+console.log(`\n${c.categories} categories, ${c.items} items, ${c.options} options`);

@@ -3,39 +3,19 @@ import { Hero } from "@/components/Hero";
 import { HomeSections } from "@/components/HomeSections";
 import { KitchenReel } from "@/components/KitchenReel";
 import { Marquee } from "@/components/Marquee";
-import { db, safeQuery } from "@/lib/db";
+import { getFeatured } from "@/lib/menu";
 
 export const revalidate = 300;
 
-export default async function HomePage() {
-  const featured = await safeQuery(
-    () =>
-      db.menuItem.findMany({
-        where: { active: true, badges: { contains: "popular" } },
-        orderBy: { sort: "asc" },
-        take: 6,
-        include: { category: true },
-      }),
-    [],
-    "home featured items"
-  );
+export default function HomePage() {
+  const featured = getFeatured();
 
   return (
     <>
       <Hero />
       <Marquee />
       <HomeSections
-        featured={featured.map((i) => ({
-          id: i.id,
-          slug: i.slug,
-          nameFr: i.nameFr,
-          nameEn: i.nameEn,
-          descFr: i.descFr,
-          descEn: i.descEn,
-          priceCents: i.priceCents,
-          image: i.image,
-          categorySlug: i.category.slug,
-        }))}
+        featured={featured}
       />
       <KitchenReel />
       <section className="border-t border-cream/10 px-4 py-20">

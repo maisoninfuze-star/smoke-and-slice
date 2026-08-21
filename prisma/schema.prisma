@@ -4,6 +4,11 @@
 // deploys. Vercel's filesystem is read-only and ephemeral, so SQLite cannot be
 // used in production.
 //
+// The menu is NOT here — it lives in src/data/menu-data.ts and is read straight
+// from that file, so the site can show a menu with no database at all. This
+// schema covers only what genuinely needs persistence: orders, accounts,
+// sessions and store settings.
+//
 // For zero-setup local work, `npm run db:local` derives a SQLite copy of this
 // schema into prisma/.schema.local.prisma (provider line swapped, nothing else)
 // so the two can never drift apart.
@@ -57,57 +62,9 @@ model Address {
   @@index([userId])
 }
 
-model Category {
-  id       String        @id @default(cuid())
-  slug     String        @unique
-  nameFr   String
-  nameEn   String
-  descFr   String?
-  descEn   String?
-  sort     Int           @default(0)
-  active   Boolean       @default(true)
-  items    MenuItem[]
-}
 
-model MenuItem {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  categoryId  String
-  category    Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  nameFr      String
-  nameEn      String
-  descFr      String?
-  descEn      String?
-  priceCents  Int
-  image       String?
-  badges      String       @default("") // comma-separated: halal,spicy,popular,new,vegetarian
-  sort        Int          @default(0)
-  active      Boolean      @default(true)
-  optionGroups OptionGroup[]
-  orderItems  OrderItem[]
-}
 
-model OptionGroup {
-  id         String       @id @default(cuid())
-  menuItemId String
-  menuItem   MenuItem     @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
-  nameFr     String
-  nameEn     String
-  minSelect  Int          @default(0)
-  maxSelect  Int          @default(1)
-  sort       Int          @default(0)
-  options    Option[]
-}
 
-model Option {
-  id            String      @id @default(cuid())
-  optionGroupId String
-  optionGroup   OptionGroup @relation(fields: [optionGroupId], references: [id], onDelete: Cascade)
-  nameFr        String
-  nameEn        String
-  priceCents    Int         @default(0)
-  sort          Int         @default(0)
-}
 
 model Order {
   id              String      @id @default(cuid())
@@ -168,8 +125,10 @@ model OrderItem {
   id             String   @id @default(cuid())
   orderId        String
   order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  // Snapshot of the menu slug this line was ordered with. Not a foreign key:
+  // the menu lives in src/data/menu-data.ts, so an item can be renamed or
+  // retired without rewriting order history.
   menuItemId     String?
-  menuItem       MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
   nameSnapshot   String
   qty            Int
   unitPriceCents Int

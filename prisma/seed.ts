@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { scrypt, randomBytes } from "node:crypto";
 import { promisify } from "node:util";
-import { MENU } from "./menu-data.js";
 
 const db = new PrismaClient();
 const scryptAsync = promisify(scrypt) as (p: string, s: string, k: number) => Promise<Buffer>;
@@ -23,71 +22,6 @@ const HOURS = [
 ];
 
 async function main() {
-  console.log("→ clearing menu tables");
-  await db.option.deleteMany();
-  await db.optionGroup.deleteMany();
-  await db.menuItem.deleteMany();
-  await db.category.deleteMany();
-
-  console.log("→ seeding menu");
-  let catSort = 0;
-  for (const cat of MENU) {
-    const category = await db.category.create({
-      data: {
-        slug: cat.slug,
-        nameFr: cat.nameFr,
-        nameEn: cat.nameEn,
-        descFr: cat.descFr,
-        descEn: cat.descEn,
-        sort: catSort++,
-      },
-    });
-
-    let itemSort = 0;
-    for (const item of cat.items) {
-      const created = await db.menuItem.create({
-        data: {
-          slug: item.slug,
-          categoryId: category.id,
-          nameFr: item.nameFr,
-          nameEn: item.nameEn,
-          descFr: item.descFr,
-          descEn: item.descEn,
-          priceCents: item.priceCents,
-          image: item.image,
-          badges: item.badges ?? "",
-          sort: itemSort++,
-        },
-      });
-
-      let groupSort = 0;
-      for (const group of item.optionGroups ?? []) {
-        const g = await db.optionGroup.create({
-          data: {
-            menuItemId: created.id,
-            nameFr: group.nameFr,
-            nameEn: group.nameEn,
-            minSelect: group.minSelect ?? 0,
-            maxSelect: group.maxSelect ?? 1,
-            sort: groupSort++,
-          },
-        });
-        let optSort = 0;
-        for (const opt of group.options) {
-          await db.option.create({
-            data: {
-              optionGroupId: g.id,
-              nameFr: opt.nameFr,
-              nameEn: opt.nameEn,
-              priceCents: opt.priceCents ?? 0,
-              sort: optSort++,
-            },
-          });
-        }
-      }
-    }
-  }
-
   console.log("→ seeding store settings");
   await db.storeSetting.upsert({
     where: { id: "singleton" },
@@ -109,12 +43,7 @@ async function main() {
     },
   });
 
-  const counts = {
-    categories: await db.category.count(),
-    items: await db.menuItem.count(),
-    options: await db.option.count(),
-  };
-  console.log("✓ seeded", counts);
+  console.log("✓ seeded store settings + admin user");
   console.log("✓ admin login: admin@mrsmokeetslice.ca / smoke2026  (change this before launch)");
 }
 

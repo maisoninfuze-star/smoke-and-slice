@@ -16,7 +16,7 @@
  * a camera position; a grid of identical three-quarter shots is the fastest way
  * to make a real menu look synthetic.
  */
-import { MENU } from "../prisma/menu-data.js";
+import { MENU } from "../src/data/menu-data.js";
 
 const LOOK =
   "Shot on a Canon EOS R5, 50mm f/1.4 at f/2.0. Single warm tungsten key from " +

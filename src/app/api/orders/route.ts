@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
+import { getItem } from "@/lib/menu";
 import { computeTotals, orderNumber } from "@/lib/money";
 import { createQuote, formatAddress, uberConfigured, UberDirectError } from "@/lib/uber";
 
@@ -50,14 +51,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "STORE_CLOSED" }, { status: 409 });
   }
 
-  // --- Re-price everything from the database. Client-sent prices are ignored. ---
-  const itemIds = [...new Set(input.lines.map((l) => l.menuItemId))];
-  const items = await db.menuItem.findMany({
-    where: { id: { in: itemIds }, active: true },
-    include: { optionGroups: { include: { options: true } } },
-  });
-  const itemById = new Map(items.map((i) => [i.id, i]));
-
+  // --- Re-price everything from the menu file. The client sends ids and
+  // quantities only; every price here is read server-side, so a forged price
+  // or option in the request body cannot affect the total. ---
   const orderItems: {
     menuItemId: string;
     nameSnapshot: string;
@@ -70,7 +66,7 @@ export async function POST(req: Request) {
   let subtotalCents = 0;
 
   for (const line of input.lines) {
-    const item = itemById.get(line.menuItemId);
+    const item = getItem(line.menuItemId);
     if (!item) return NextResponse.json({ error: "ITEM_UNAVAILABLE", id: line.menuItemId }, { status: 409 });
 
     const validOptions = new Map(

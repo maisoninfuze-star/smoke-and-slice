@@ -13,7 +13,7 @@
 import { mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { MENU } from "../prisma/menu-data.js";
+import { MENU } from "../src/data/menu-data.js";
 import { buildAutoDishes } from "./menu-brief-auto.js";
 import { NEGATIVE } from "./menu-brief.js";
 import { requireKey, runModel, download, exists } from "./fal.js";

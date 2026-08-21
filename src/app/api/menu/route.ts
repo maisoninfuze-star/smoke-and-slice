@@ -1,28 +1,8 @@
 import { NextResponse } from "next/server";
-import { db, safeQuery } from "@/lib/db";
+import { getMenu } from "@/lib/menu";
 
-export const revalidate = 60;
+export const dynamic = "force-static";
 
 export async function GET() {
-  const categories = await safeQuery(
-    () => db.category.findMany({
-    where: { active: true },
-    orderBy: { sort: "asc" },
-    include: {
-      items: {
-        where: { active: true },
-        orderBy: { sort: "asc" },
-        include: {
-          optionGroups: {
-            orderBy: { sort: "asc" },
-            include: { options: { orderBy: { sort: "asc" } } },
-          },
-        },
-      },
-    },
-  }),
-    [],
-    "api menu"
-  );
-  return NextResponse.json({ categories });
+  return NextResponse.json({ categories: getMenu() });
 }
