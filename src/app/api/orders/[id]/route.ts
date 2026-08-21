@@ -1,12 +1,24 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getDelivery, uberConfigured, mapUberStatus } from "@/lib/uber";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 /**
  * Public order lookup. Accepts either the internal id or the human order number
  * so a customer can type "MSS-4F2K9" on the tracking page.
  */
-export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
+  // Order numbers are five characters, so a script could walk the space and
+  // harvest customer names. A tracking page polls every 20s; 60/minute leaves
+  // plenty of headroom for real use.
+  const limit = rateLimit(clientKey(req, "order-lookup"), 60, 60);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "TOO_MANY_REQUESTS" },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    );
+  }
+
   const { id } = await ctx.params;
 
   const order = await db.order.findFirst({

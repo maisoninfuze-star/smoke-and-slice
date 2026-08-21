@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { hashPassword, createSession } from "@/lib/auth";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 const schema = z.object({
   name: z.string().min(2).max(80),
@@ -11,6 +12,14 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
+  const limit = rateLimit(clientKey(req, "signup"), 5, 900);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "TOO_MANY_ATTEMPTS" },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    );
+  }
+
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "INVALID_INPUT", issues: parsed.error.flatten() }, { status: 400 });

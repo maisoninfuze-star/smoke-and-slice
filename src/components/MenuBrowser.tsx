@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useCart } from "./CartProvider";
 import { formatMoney } from "@/lib/money";
 import { t } from "@/lib/i18n";
+import { STORE } from "@/lib/store";
 import { ItemDialog, type MenuItemFull } from "./ItemDialog";
 
 export type CategoryFull = {
@@ -64,6 +65,7 @@ export function MenuBrowser({ categories }: { categories: CategoryFull[] }) {
         </p>
       </header>
 
+      {categories.length > 0 && (
       <nav className="no-scrollbar sticky top-[73px] z-20 -mx-4 mb-10 flex gap-2 overflow-x-auto border-y border-cream/10 bg-charcoal-deep/90 px-4 py-3 backdrop-blur-xl">
         {categories.map((c) => (
           <a
@@ -75,6 +77,24 @@ export function MenuBrowser({ categories }: { categories: CategoryFull[] }) {
           </a>
         ))}
       </nav>
+      )}
+
+      {categories.length === 0 && (
+        <div className="card mx-auto max-w-lg px-6 py-14 text-center">
+          <div className="text-4xl">🔥</div>
+          <h2 className="display mt-4 text-2xl">
+            {lang === "fr" ? "Menu momentanément indisponible" : "Menu temporarily unavailable"}
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-cream/65">
+            {lang === "fr"
+              ? "On n'arrive pas à charger le menu en ce moment. Appelez-nous, on prend votre commande au téléphone."
+              : "We can't load the menu right now. Give us a call and we'll take your order by phone."}
+          </p>
+          <a href={`tel:${STORE.phone}`} className="btn-ember mt-6 inline-block rounded-full px-7 py-3 text-sm">
+            {STORE.phoneDisplay}
+          </a>
+        </div>
+      )}
 
       <div className="space-y-16">
         {categories.map((cat) => (

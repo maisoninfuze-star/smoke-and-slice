@@ -2,10 +2,21 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { verifyPassword, createSession } from "@/lib/auth";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 const schema = z.object({ email: z.string().email(), password: z.string().min(1) });
 
 export async function POST(req: Request) {
+  // 8 attempts per IP per 5 minutes. Enough for a person mistyping a password,
+  // useless for a script working through a credential dump.
+  const limit = rateLimit(clientKey(req, "login"), 8, 300);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "TOO_MANY_ATTEMPTS" },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } }
+    );
+  }
+
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
 
