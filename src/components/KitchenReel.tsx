@@ -45,19 +45,49 @@ export function KitchenReel() {
       return;
     }
 
+    // Track what *should* be playing, separately from what is. The browser
+    // pauses media whenever the document goes hidden (tab switch, phone lock,
+    // app backgrounded) and never resumes it on its own, so without the
+    // visibilitychange handler below a viewer who glances away comes back to a
+    // dead frame.
+    const wanted = new Set<HTMLVideoElement>();
+
+    const play = (v: HTMLVideoElement) => {
+      if (document.hidden) return;
+      void v.play().catch(() => {
+        // Autoplay blocked (some mobile data-saver modes). The poster stays up,
+        // so give the viewer a way to start it themselves.
+        v.controls = true;
+      });
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const v = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting) void v.play().catch(() => {});
-          else v.pause();
+          if (entry.isIntersecting) {
+            wanted.add(v);
+            play(v);
+          } else {
+            wanted.delete(v);
+            v.pause();
+          }
         });
       },
       { threshold: 0.35 }
     );
 
+    const onVisibility = () => {
+      if (document.hidden) return;
+      wanted.forEach(play);
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     videos.forEach((v) => io.observe(v));
-    return () => io.disconnect();
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   return (

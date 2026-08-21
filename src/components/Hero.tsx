@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { useCart } from "./CartProvider";
 import { t } from "@/lib/i18n";
 import { STORE } from "@/lib/store";
@@ -10,12 +11,29 @@ import { SliceTitle } from "./motion/SliceTitle";
 export function Hero() {
   const { lang } = useCart();
   const copy = t(lang);
+  const video = useRef<HTMLVideoElement>(null);
+
+  // Browsers pause media while the document is hidden and do not resume it.
+  // This is the first frame of the site, so it must not come back frozen.
+  useEffect(() => {
+    const el = video.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const resume = () => {
+      if (!document.hidden) void el.play().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", resume);
+    resume();
+    return () => document.removeEventListener("visibilitychange", resume);
+  }, []);
 
   return (
     <section className="grain relative overflow-hidden">
       {/* Media bed: video if present, still frame as poster/fallback */}
       <div className="absolute inset-0" data-parallax="6">
         <video
+          ref={video}
           className="h-full w-full object-cover"
           autoPlay
           muted

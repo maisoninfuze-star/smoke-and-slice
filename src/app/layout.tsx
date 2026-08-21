@@ -4,6 +4,8 @@ import { CartProvider } from "@/components/CartProvider";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { IntroSplash } from "@/components/IntroSplash";
+import { IntroCleanup } from "@/components/IntroCleanup";
 import { STORE } from "@/lib/store";
 import { siteUrlObject } from "@/lib/site";
 import "./globals.css";
@@ -62,7 +64,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <html lang="fr-CA" className={`${anton.variable} ${bebas.variable} ${inter.variable}`}>
+    <html
+      lang="fr-CA"
+      className={`${anton.variable} ${bebas.variable} ${inter.variable}`}
+      // the pre-paint intro script stamps data-intro before React hydrates
+      suppressHydrationWarning
+    >
       <head>
         {/* Three voices, one rule:
             Cabinet Grotesk is the restaurant speaking (headlines, section titles),
@@ -74,8 +81,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,900,700&f[]=satoshi@400,500,700,900&f[]=erode@400,500,600&display=swap"
           rel="stylesheet"
         />
+        {/* Pre-paint gate. Must block painting, so it is inline in <head>:
+            anything later would flash the overlay on repeat views. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{" +
+              "var d=document.documentElement,h=location.hash," +
+              "replay=(h==='#intro'||h==='#introhold');" +
+              // Decided here, before hydration: by the time a React effect runs
+              // the hash may not have been applied to location yet.
+              "if(h==='#introhold'){d.dataset.introHold='1';}" +
+              "if(!replay&&(sessionStorage.getItem('mssIntro')||matchMedia('(prefers-reduced-motion: reduce)').matches)){" +
+              "d.dataset.intro='skip';" +
+              "}else{sessionStorage.setItem('mssIntro','1');}" +
+              "}catch(e){}})();",
+          }}
+        />
       </head>
       <body className="min-h-dvh flex flex-col">
+        <IntroSplash />
+        <IntroCleanup />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
