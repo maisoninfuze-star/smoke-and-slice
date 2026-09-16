@@ -115,7 +115,7 @@ export function MenuBrowser({ categories }: { categories: CategoryFull[] }) {
                   <article key={item.id} className="card card-hover flex flex-col overflow-hidden">
                     {item.image && !broken.has(item.id) && (
                       <button
-                        onClick={() => setActive(item)}
+                        onClick={() => STORE.onlineOrdering && setActive(item)}
                         className="relative aspect-[16/10] w-full overflow-hidden bg-slate-soft"
                         aria-label={lang === "fr" ? item.nameFr : item.nameEn}
                       >
@@ -164,6 +164,7 @@ export function MenuBrowser({ categories }: { categories: CategoryFull[] }) {
                         </div>
                       )}
 
+                      {STORE.onlineOrdering && (
                       <button
                         onClick={() => quickAdd(item)}
                         className={`mt-4 rounded-full py-2.5 text-sm transition-all ${
@@ -180,6 +181,7 @@ export function MenuBrowser({ categories }: { categories: CategoryFull[] }) {
                               : "Customise"
                             : copy.common.addToCart}
                       </button>
+                      )}
                     </div>
                   </article>
                 );

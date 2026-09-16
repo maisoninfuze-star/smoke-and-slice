@@ -19,7 +19,11 @@ export function OrderCta() {
           )}
         </h2>
         <p className="mt-4 text-cream/70">
-          {STORE.deliveryEnabled
+          {!STORE.onlineOrdering
+            ? lang === "fr"
+              ? "Appelez-nous pour commander à emporter, ou faites-vous livrer via nos partenaires."
+              : "Call us to order for pickup, or get it delivered through our partners."
+            : STORE.deliveryEnabled
             ? lang === "fr"
               ? "Livraison partout dans NDG et les quartiers voisins, ou ramassage au comptoir."
               : "Delivery across NDG and the neighbouring boroughs, or counter pickup."
@@ -28,9 +32,15 @@ export function OrderCta() {
               : "Order online for counter pickup, or get it delivered through our partners."}
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link href="/menu" className="btn-ember inline-block rounded-full px-9 py-3.5 text-sm">
-            {lang === "fr" ? "Commander pour ramassage" : "Order for pickup"}
-          </Link>
+          {STORE.onlineOrdering ? (
+            <Link href="/menu" className="btn-ember inline-block rounded-full px-9 py-3.5 text-sm">
+              {lang === "fr" ? "Commander pour ramassage" : "Order for pickup"}
+            </Link>
+          ) : (
+            <a href={`tel:${STORE.phone}`} className="btn-ember inline-block rounded-full px-9 py-3.5 text-sm">
+              {lang === "fr" ? "Appeler" : "Call"} · {STORE.phoneDisplay}
+            </a>
+          )}
           <DeliveryPartners align="center" />
         </div>
       </div>

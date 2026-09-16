@@ -67,7 +67,9 @@ export function Footer() {
           <h3 className="accent mb-3 text-sm text-gold">{copy.nav.menu}</h3>
           <ul className="space-y-1.5 text-sm text-smoke">
             <li><Link href="/menu" className="hover:text-gold">{copy.nav.menu}</Link></li>
-            <li><Link href="/checkout" className="hover:text-gold">{copy.common.checkout}</Link></li>
+            {STORE.onlineOrdering && (
+              <li><Link href="/checkout" className="hover:text-gold">{copy.common.checkout}</Link></li>
+            )}
             <li><Link href="/track" className="hover:text-gold">{copy.nav.track}</Link></li>
             <li><Link href="/account" className="hover:text-gold">{copy.nav.account}</Link></li>
           </ul>

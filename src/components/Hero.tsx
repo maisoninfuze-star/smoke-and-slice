@@ -63,12 +63,25 @@ export function Hero() {
         </p>
 
         <div data-reveal data-reveal-delay="1.05" className="mt-9 flex flex-wrap items-center gap-3">
-          <Link href="/menu" className="btn-ember rounded-full px-8 py-3.5 text-sm">
-            {copy.hero.cta}
-          </Link>
-          <a href={`tel:${STORE.phone}`} className="btn-ghost rounded-full px-7 py-3.5 text-sm">
-            {STORE.phoneDisplay}
-          </a>
+          {STORE.onlineOrdering ? (
+            <>
+              <Link href="/menu" className="btn-ember rounded-full px-8 py-3.5 text-sm">
+                {copy.hero.cta}
+              </Link>
+              <a href={`tel:${STORE.phone}`} className="btn-ghost rounded-full px-7 py-3.5 text-sm">
+                {STORE.phoneDisplay}
+              </a>
+            </>
+          ) : (
+            <>
+              <a href={`tel:${STORE.phone}`} className="btn-ember rounded-full px-8 py-3.5 text-sm">
+                {lang === "fr" ? "Appelez pour commander" : "Call to order"} · {STORE.phoneDisplay}
+              </a>
+              <Link href="/menu" className="btn-ghost rounded-full px-7 py-3.5 text-sm">
+                {copy.hero.ctaSecondary}
+              </Link>
+            </>
+          )}
         </div>
 
         <div data-reveal data-reveal-delay="1.2" className="mt-10 flex items-center gap-3 text-sm">

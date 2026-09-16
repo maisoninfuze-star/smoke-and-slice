@@ -93,6 +93,7 @@ export function Header() {
               ))}
             </div>
 
+            {STORE.onlineOrdering && (
             <button
               onClick={() => setOpen(true)}
               className="relative rounded-full border border-cream/20 p-2 transition-colors hover:border-gold"
@@ -110,6 +111,7 @@ export function Header() {
                 </span>
               )}
             </button>
+            )}
 
             <button
               onClick={() => setMenuOpen((v) => !v)}
@@ -143,7 +145,7 @@ export function Header() {
         )}
       </header>
 
-      <CartDrawer open={open} onClose={() => setOpen(false)} />
+      {STORE.onlineOrdering && <CartDrawer open={open} onClose={() => setOpen(false)} />}
     </>
   );
 }

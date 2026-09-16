@@ -15,6 +15,14 @@ export const STORE = {
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Mr+Smoke+Et+Slice+5518+Sherbrooke+St+W+Montreal",
 
   /**
+   * Online ordering is closed for now — no cart, no checkout, no pickup
+   * orders. The site is a menu and information site: customers phone for
+   * pickup and use the marketplaces below for delivery. Enforced in the
+   * orders API, not just hidden in the UI. Flip to true to reopen.
+   */
+  onlineOrdering: false,
+
+  /**
    * Our own delivery (Uber Direct) is switched off for now. While it is off,
    * the checkout is pickup-only — enforced in the orders API, not just hidden
    * in the UI — and delivery customers are sent to the marketplaces below.

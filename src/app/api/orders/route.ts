@@ -43,6 +43,12 @@ export async function POST(req: Request) {
   }
   const input = parsed.data;
 
+  // Online ordering is closed in STORE — refuse everything, whatever the
+  // client sends. The UI hides the cart, but this is the rule that holds.
+  if (!STORE.onlineOrdering) {
+    return NextResponse.json({ error: "ORDERING_CLOSED" }, { status: 409 });
+  }
+
   // Delivery is switched off in STORE — refuse it here so the rule holds even
   // if a client bypasses the checkout UI.
   if (input.fulfilment === "DELIVERY" && !STORE.deliveryEnabled) {
