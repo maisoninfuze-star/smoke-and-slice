@@ -5,6 +5,7 @@ import { useCart } from "./CartProvider";
 import { t } from "@/lib/i18n";
 import { STORE } from "@/lib/store";
 import { HalalBadge } from "./Logo";
+import { DeliveryPartners } from "./DeliveryPartners";
 
 const HOURS = [
   { fr: "Lundi – Jeudi", en: "Monday – Thursday", time: "11:00 – 23:00" },
@@ -74,10 +75,12 @@ export function Footer() {
       </div>
 
       <div className="border-t border-cream/10 px-4 py-5">
-        <p className="mx-auto max-w-6xl text-center text-xs text-smoke">
-          © {new Date().getFullYear()} {STORE.name} · {STORE.addressShort} ·{" "}
-          {lang === "fr" ? "Livraison par" : "Delivery powered by"} Uber Direct
-        </p>
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3">
+          <DeliveryPartners size="sm" align="center" />
+          <p className="text-center text-xs text-smoke">
+            © {new Date().getFullYear()} {STORE.name} · {STORE.addressShort}
+          </p>
+        </div>
       </div>
     </footer>
   );

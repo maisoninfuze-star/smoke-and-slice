@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { getItem } from "@/lib/menu";
+import { STORE } from "@/lib/store";
 import { computeTotals, orderNumber } from "@/lib/money";
 import { createQuote, formatAddress, uberConfigured, UberDirectError } from "@/lib/uber";
 
@@ -41,6 +42,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "INVALID_INPUT", issues: parsed.error.flatten() }, { status: 400 });
   }
   const input = parsed.data;
+
+  // Delivery is switched off in STORE — refuse it here so the rule holds even
+  // if a client bypasses the checkout UI.
+  if (input.fulfilment === "DELIVERY" && !STORE.deliveryEnabled) {
+    return NextResponse.json({ error: "DELIVERY_DISABLED" }, { status: 409 });
+  }
 
   if (input.fulfilment === "DELIVERY" && !input.address) {
     return NextResponse.json({ error: "ADDRESS_REQUIRED" }, { status: 400 });

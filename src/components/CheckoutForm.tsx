@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useCart, lineTotal } from "./CartProvider";
 import { formatMoney, computeTotals } from "@/lib/money";
 import { t } from "@/lib/i18n";
+import { STORE } from "@/lib/store";
+import { DeliveryPartners } from "./DeliveryPartners";
 
 type Quote = { feeCents: number; etaMinutes: number; source: string } | null;
 type Me = { id: string; name: string; phone: string | null } | null;
@@ -17,7 +19,9 @@ export function CheckoutForm() {
   const copy = t(lang);
   const router = useRouter();
 
-  const [fulfilment, setFulfilment] = useState<"PICKUP" | "DELIVERY">("DELIVERY");
+  const [fulfilment, setFulfilment] = useState<"PICKUP" | "DELIVERY">(
+    STORE.deliveryEnabled ? "DELIVERY" : "PICKUP"
+  );
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -201,8 +205,23 @@ export function CheckoutForm() {
         </h1>
 
         {/* Fulfilment */}
-        <div className="mt-8 grid grid-cols-2 gap-2">
-          {(["DELIVERY", "PICKUP"] as const).map((mode) => (
+        {!STORE.deliveryEnabled && (
+          <div className="mt-8 rounded-xl border border-cream/15 bg-charcoal/40 px-5 py-4">
+            <p className="accent text-sm text-gold">
+              {lang === "fr" ? "Livraison" : "Delivery"}
+            </p>
+            <p className="mt-1 text-sm text-cream/75">
+              {lang === "fr"
+                ? "Pour la livraison, commandez via nos partenaires. Ici, c'est ramassage au comptoir."
+                : "For delivery, order through our partners. Here it's counter pickup."}
+            </p>
+            <div className="mt-3">
+              <DeliveryPartners size="sm" />
+            </div>
+          </div>
+        )}
+        <div className={`mt-8 grid gap-2 ${STORE.deliveryEnabled ? "grid-cols-2" : "grid-cols-1"}`}>
+          {(STORE.deliveryEnabled ? (["DELIVERY", "PICKUP"] as const) : (["PICKUP"] as const)).map((mode) => (
             <button
               key={mode}
               onClick={() => setFulfilment(mode)}
@@ -338,7 +357,9 @@ export function CheckoutForm() {
             >
               <span className="accent block">{lang === "fr" ? "Comptant / débit sur place" : "Cash / debit on arrival"}</span>
               <span className="mt-0.5 block text-xs text-smoke">
-                {lang === "fr" ? "Payez au livreur ou au comptoir" : "Pay the courier or at the counter"}
+                {STORE.deliveryEnabled
+                  ? lang === "fr" ? "Payez au livreur ou au comptoir" : "Pay the courier or at the counter"
+                  : lang === "fr" ? "Payez au comptoir en venant chercher" : "Pay at the counter on pickup"}
               </span>
             </button>
             <button
