@@ -82,6 +82,17 @@ export function Footer() {
           <p className="text-center text-xs text-smoke">
             © {new Date().getFullYear()} {STORE.name} · {STORE.addressShort}
           </p>
+          <p className="text-center text-xs text-smoke">
+            {lang === "fr" ? "Propulsé par" : "Powered by"}{" "}
+            <a
+              href="https://b12ventures.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gold"
+            >
+              B12 Ventures
+            </a>
+          </p>
         </div>
       </div>
     </footer>
