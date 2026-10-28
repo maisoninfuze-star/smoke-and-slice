@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { IntroSplash } from "@/components/IntroSplash";
 import { IntroCleanup } from "@/components/IntroCleanup";
 import { STORE } from "@/lib/store";
+import { openingHoursSpecification } from "@/lib/hours";
 import { siteUrlObject } from "@/lib/site";
 import "./globals.css";
 
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       ratingValue: STORE.googleRating,
       reviewCount: STORE.googleReviews,
     },
+    openingHoursSpecification: openingHoursSpecification(),
     acceptsReservations: false,
     hasDeliveryMethod: ["https://schema.org/OnSitePickup", "https://schema.org/ParcelService"],
   };

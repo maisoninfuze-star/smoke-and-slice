@@ -11,15 +11,8 @@ async function hash(password: string) {
   return `${salt}:${derived.toString("hex")}`;
 }
 
-const HOURS = [
-  { day: "Lundi / Monday", open: "11:00", close: "23:00" },
-  { day: "Mardi / Tuesday", open: "11:00", close: "23:00" },
-  { day: "Mercredi / Wednesday", open: "11:00", close: "23:00" },
-  { day: "Jeudi / Thursday", open: "11:00", close: "23:00" },
-  { day: "Vendredi / Friday", open: "11:00", close: "00:00" },
-  { day: "Samedi / Saturday", open: "11:00", close: "00:00" },
-  { day: "Dimanche / Sunday", open: "12:00", close: "23:00" },
-];
+import { WEEK } from "../src/lib/hours.js";
+const HOURS = WEEK;
 
 async function main() {
   console.log("→ seeding store settings");

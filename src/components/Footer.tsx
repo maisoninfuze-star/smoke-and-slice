@@ -6,12 +6,8 @@ import { t } from "@/lib/i18n";
 import { STORE } from "@/lib/store";
 import { HalalBadge } from "./Logo";
 import { DeliveryPartners } from "./DeliveryPartners";
-
-const HOURS = [
-  { fr: "Lundi – Jeudi", en: "Monday – Thursday", time: "11:00 – 23:00" },
-  { fr: "Vendredi – Samedi", en: "Friday – Saturday", time: "11:00 – 00:00" },
-  { fr: "Dimanche", en: "Sunday", time: "12:00 – 23:00" },
-];
+import { hoursRows } from "@/lib/hours";
+import { OpenStatus } from "./OpenStatus";
 
 export function Footer() {
   const { lang } = useCart();
@@ -37,11 +33,14 @@ export function Footer() {
 
         <div>
           <h3 className="accent mb-3 text-sm text-gold">{copy.footer.hours}</h3>
+          <OpenStatus className="mb-2" />
           <ul className="space-y-1.5 text-sm text-smoke">
-            {HOURS.map((h) => (
-              <li key={h.en} className="flex justify-between gap-4">
-                <span>{lang === "fr" ? h.fr : h.en}</span>
-                <span className="text-cream/80">{h.time}</span>
+            {hoursRows(lang).map((h) => (
+              <li key={h.label} className="flex justify-between gap-4">
+                <span>{h.label}</span>
+                <span className={h.time ? "text-cream/80" : "text-flame"}>
+                  {h.time ?? (lang === "fr" ? "Fermé" : "Closed")}
+                </span>
               </li>
             ))}
           </ul>

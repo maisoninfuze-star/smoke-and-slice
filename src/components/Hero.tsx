@@ -13,6 +13,47 @@ export function Hero() {
   const copy = t(lang);
   const video = useRef<HTMLVideoElement>(null);
 
+  // The hero video is decoration over a poster that already carries the shot.
+  // Attaching its source from JS (rather than a <source> tag) keeps the
+  // browser from spending the visitor's data on it before we know it is
+  // wanted: skipped on Save-Data, on slow or metered connections, on narrow
+  // screens, and for anyone who asked for reduced motion. The poster stays.
+  useEffect(() => {
+    const el = video.current;
+    if (!el || el.getAttribute("src")) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(max-width: 640px)").matches) return;
+
+    const conn = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+    if (conn?.saveData) return;
+    if (conn?.effectiveType && /2g|slow-2g|3g/.test(conn.effectiveType)) return;
+
+    // Wait for the page to settle so the video never competes with the
+    // poster, the fonts or the menu data for bandwidth.
+    const start = () => {
+      el.src = "/media/hero.mp4";
+      el.load();
+      void el.play().catch(() => {});
+    };
+    // requestIdleCallback is still missing on Safari, so fall back to a timer.
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number;
+      cancelIdleCallback?: (h: number) => void;
+    };
+    const useIdle = typeof w.requestIdleCallback === "function";
+    const handle = useIdle
+      ? w.requestIdleCallback!(start, { timeout: 2500 })
+      : window.setTimeout(start, 1200);
+
+    return () => {
+      if (useIdle) w.cancelIdleCallback?.(handle);
+      else clearTimeout(handle);
+    };
+  }, []);
+
   // Browsers pause media while the document is hidden and do not resume it.
   // This is the first frame of the site, so it must not come back frozen.
   useEffect(() => {
@@ -21,7 +62,7 @@ export function Hero() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const resume = () => {
-      if (!document.hidden) void el.play().catch(() => {});
+      if (!document.hidden && el.getAttribute("src")) void el.play().catch(() => {});
     };
     document.addEventListener("visibilitychange", resume);
     resume();
@@ -40,9 +81,8 @@ export function Hero() {
           loop
           playsInline
           poster="/media/hero-poster.jpg"
-        >
-          <source src="/media/hero.mp4" type="video/mp4" />
-        </video>
+          preload="none"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-charcoal-deep via-charcoal-deep/85 to-charcoal-deep/35" />
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-deep via-transparent to-charcoal-deep/60" />
       </div>

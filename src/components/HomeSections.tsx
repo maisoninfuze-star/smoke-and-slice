@@ -145,7 +145,10 @@ export function HomeSections({ featured }: { featured: Featured[] }) {
               </div>
               <div className="flex gap-3">
                 <dt className="accent w-24 shrink-0 text-smoke">{lang === "fr" ? "Heures" : "Hours"}</dt>
-                <dd className="text-cream/80">11:00 – 23:00 {lang === "fr" ? "(min. jusqu'à 00:00 ven–sam)" : "(to 00:00 Fri–Sat)"}</dd>
+                <dd className="text-cream/80">
+                  {lang === "fr" ? "Mardi – dimanche, 11:00 – 23:00" : "Tuesday – Sunday, 11:00 – 23:00"}
+                  <span className="block text-smoke">{lang === "fr" ? "Fermé le lundi" : "Closed Mondays"}</span>
+                </dd>
               </div>
             </dl>
           </div>
